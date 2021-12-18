@@ -1,0 +1,108 @@
+<!-- Log out Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Log Out</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to Log Out?
+            </div>
+            <div class="modal-footer">
+                <form>
+                    <button type="button" class="btn btn-primary">Log Out</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Nav bar -->
+<div class="row p-0" style="margin-right: 0px; margin-left: 0px;">
+    <div class="col p-0">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom" style="height: 8vh;">
+            <span class="navbar-brand">Task Scheduler</span>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0 mx-1" type="submit">Search</button>
+                </form>
+                <button type="button" class="btn btn-outline-dark mx-1" data-toggle="modal" data-target="#logoutModal">
+                    Log Out </button>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="row p-0" style="margin-right: 0px; margin-left: 0px;">
+    <!-- Side bar -->
+    <div id="sideBar" class="col-auto p-0" style="height: 92vh; width: 15vw; overflow: scroll;">
+        <div class="border-right h-100 d-flex flex-column bg-light">
+            <ul class="nav nav-pills flex-column mb-auto my-2 mx-2" style="height: 70vh;">
+                <li class="nav-item">
+                    <a routerLink="my-tasks" routerLinkActive='active-link' class="nav-link">
+                        My Tasks
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="add-task" routerLinkActive='active-link' class="nav-link">
+                        Add New Task
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="add-routine" routerLinkActive='active-link' class="nav-link">
+                        Add New Routine
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="calendar" routerLinkActive='active-link' class="nav-link">
+                        Calendar
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="weekly-timetable" routerLinkActive='active-link' class="nav-link">
+                        Weekly Time-Table
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="pie-chart" routerLinkActive='active-link' class="nav-link">
+                        Pie Chart
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="report" routerLinkActive='active-link' class="nav-link">
+                        Report
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav nav-pills flex-column mx-2 my-2">
+                <li>
+                    <a routerLink="my-account" routerLinkActive='active-link' class="nav-link">
+                        My Account
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="about" routerLinkActive='active-link' class="nav-link">
+                        About Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- main content of page -->
+    <div class="col-auto" style="height: 92vh; width:84.5vw;" id="mainContentOfPage">
+        <router-outlet></router-outlet>
+    </div>
+</div>

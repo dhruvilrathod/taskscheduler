@@ -1,0 +1,94 @@
+/* You can add global styles to this file, and also import other style files */
+@media only screen and (max-width: 600px) {
+    #sideBar {
+        display: none;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 0.5vw;
+    margin-right: 1px;
+}
+
+::-webkit-scrollbar-track {
+    background: white;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.nav-link{
+    color: darkslategray;
+}
+
+.nav-link:hover{
+    background-color: lightgray;
+    color: black;
+}
+
+.active-link{
+    background-color: darkslategray;
+    color: white;
+}
+
+.active-link:hover{
+    background-color: darkslategray;
+    color: white;
+}
+
+.veryHigh {
+    color: red;
+}
+
+.high {
+    color: orange;
+}
+
+.medium {
+    color: yellow;
+}
+
+.low {
+    color: lightgreen;
+}
+#taskTitle:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#pr1{
+    color: red;
+}
+
+#pr2{
+    color: orange;
+}
+
+#pr3{
+    color: yellow;
+}
+
+#pr4{
+    color: greenyellow;
+}
+
+#pr1-border{
+    border-color: red;   
+}
+
+#pr2-border{
+   border-color: orange;   
+}
+
+#pr3-border{
+    border-color: yellow;   
+}
+
+#pr4-border{
+    border-color: greenyellow;   
+}
