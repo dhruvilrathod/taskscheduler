@@ -1,93 +1,82 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
-<!-- task added alert -->
-<div style="display:none;" id="addTaskAlert">
-    <div class="alert alert-success alert-dismissable" id="addTaskAlert2">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        Task added successfully.
+<!-- loading -->
+<div *ngIf='loading' class="d-flex justify-content-center align-items-center" style="height: 92vh;">
+    <div class="spinner-border" style="width: 10vw; height: 10vw; color: blue; border-width: 0.5vw;" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
 </div>
+
 <!-- main content of page -->
-<div class="row" style="flex-wrap: nowrap;">
+<div *ngIf="!loading" class="row" style="flex-wrap: nowrap;">
     <div class="col-8">
         <div class="container my-4 mx-2">
             <h1>Add a new Task</h1>
         </div>
     </div>
 </div>
-<div class="container align-items-center mx-2">
+<div *ngIf="!loading" class="container align-items-center mx-2">
     <div id="mainContent" class="px-4 border" style="overflow-y: scroll; height: 75vh; width: 80vw;">
-        <form [formGroup]="addTaskForm" (ngSubmit)="addNewTask(addTaskForm)" class="my-4">
+        <form [formGroup]="addTaskForm" (ngSubmit)="addNewTask(addTaskForm)" class="py-4">
             <div class="form-group">
                 <label>Task Name</label>
-                <input
+                <input type="text"
                     [ngClass]="{'is-invalid': addTaskForm.get('taskname').errors && (addTaskForm.get('taskname').touched || addTaskForm.get('taskname').dirty)}"
-                    formControlName="taskname" type="text" class="form-control" id="exampleFormControlInput1">
-                <span *ngIf="addTaskForm.get('taskname').errors" class="invalid-feedback">Task Name is required.</span>
+                    formControlName="taskname" class="form-control">
+                <span *ngIf="addTaskForm.get('taskname').errors" class="invalid-feedback">Task Name is
+                    necessary.</span>
             </div>
             <div class="form-group">
                 <label>Task Priority</label>
-                <select formControlName="priority" class="form-control" id="exampleFormControlSelect1"
+                <select formControlName="priority" class="form-control"
                     [ngClass]="{'is-invalid': addTaskForm.get('priority').errors && (addTaskForm.get('priority').touched || addTaskForm.get('priority').dirty)}">
-                    <option>Very High</option>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
+                    <option value="1">Very High</option>
+                    <option value="2">High</option>
+                    <option value="3">Medium</option>
+                    <option value="4">Low</option>
                 </select>
-                <span *ngIf="addTaskForm.get('priority').errors" class="invalid-feedback">Priority is required.</span>
+                <span *ngIf="addTaskForm.get('priority').errors" class="invalid-feedback">Priority is
+                    required.</span>
+
             </div>
             <div class="form-group">
-                <label>Date</label>
-                <input
-                    [ngClass]="{'is-invalid': addTaskForm.get('date').errors && (addTaskForm.get('date').touched || addTaskForm.get('date').dirty)}"
-                    formControlName="date" class="form-control" type="date" min="{{today}}"
-                    (change)="checkSpecialDate(addTaskForm.controls.date)">
-                <span *ngIf="addTaskForm.get('date').errors" class="invalid-feedback">Enter a valid date.</span>
+                <label>Start Date</label>
+                <input formControlName="startdate" class="form-control" type="date" min="{{today}}"
+                    (change)="checkSpecialDate($event)"
+                    [ngClass]="{'is-invalid': addTaskForm.get('startdate').errors && (addTaskForm.get('startdate').touched || addTaskForm.get('startdate').dirty)}">
+                <span *ngIf="addTaskForm.get('startdate').errors" class="invalid-feedback">Enter a valid
+                    date.</span>
             </div>
-            <div *ngIf="isSpecialDate" class="alert alert-info fade show" role="alert">
-                <strong>Holiday Alert!</strong> {{selectedMonth}} {{selectedDate}}, {{selectedYear}} is
-                {{occasion}}.
+            <div *ngIf="isSpecialDate" class="alert alert-primary" role="alert">
+                <strong>Holiday Alert! </strong> {{occasion}}
+            </div>
+            <div class="form-group">
+                <label>Deadline</label>
+                <input formControlName="deadline" class="form-control" type="date" min="{{today}}"
+                    (change)="verifytDeadline($event)"
+                    [ngClass]="{'is-invalid': addTaskForm.get('deadline').errors && (addTaskForm.get('deadline').touched || addTaskForm.get('deadline').dirty)}">
+                <span *ngIf="addTaskForm.get('deadline').errors" class="invalid-feedback">Enter a valid
+                    deadline.</span>
             </div>
             <div class="form-group">
                 <label>Task Description</label>
                 <textarea formControlName="description" class="form-control" rows="5"></textarea>
             </div>
-            <div class="form-group">
-                Attechments: <br>
-                <div class="border px-2 py-4 rounded" [ngClass]="{'': isDragLeave, 'border-primary': isDragOver}"
-                    (drop)="onDrop($event)" (dragenter)="dragenter($event)" (dragleave)="dragleave($event)"
-                    (dragover)="dragover($event)">
-                    <div class="text-center text-muted">
-                        <input #fileInput id="file-input" formControlName='attechment' (change)="onFileSelected($event)"
-                            style="display: none;" type="file" multiple>
-                        {{dropMessage}}
-                    </div>
-                    <div *ngFor="let fileName of fileNames; let i=index" class="px-0">
-                        <button (click)="removeFile(i)" class="btn btn-outline-dark mb-1">
-                            <i class="fa fa-close"></i>
-                        </button> {{i+1+'. '}}{{fileName.name}} ({{fileName.size/1048576 | number}} MB)
-                    </div>
+            <div *ngIf="submissionSuccessful" id="addTaskAlert">
+                <div class="alert alert-success alert-dismissable" id="addTaskAlert2">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="submissionSuccessful"
+                        (click)="submissionSuccessful = !submissionSuccessful">&times;</button>
+                    Task added successfully.
                 </div>
-                <br>
-                <button type="button" class="btn btn-outline-dark" onclick="$('#file-input').click();">Add
-                    Attechments</button>
             </div>
+            <span *ngIf="isError" class="invalid-feedback">{{errorMessage}}
+                deadline.</span>
             <div class="container text-center">
-                <!-- working code -->
-                <button *ngIf="submitting" class="btn btn-primary mx-2" disabled>
-                    <i class="fa fa-spinner fa-spin"></i>
-                    Adding Task</button>
-                <button *ngIf="!submitting" class="btn btn-primary mx-2" [disabled]="!addTaskForm.valid" type="submit">
-                    Add Task</button>
-                <button class="btn btn-outline-danger mx-2" type="button" (click)="resetForm()">Reset</button>
-
-                <!-- <button *ngIf="submitting" class="btn btn-primary mx-2" disabled>
-                    <i class="fa fa-spinner fa-spin"></i>
-                    Adding Task</button>
-                <button *ngIf="!submitting" class="btn btn-primary mx-2" type="submit">
-                    Add Task</button> 
-                <button class="btn btn-outline-danger mx-2" type="reset" (click)="resetForm()">Reset</button> -->
+                <button *ngIf="!isSubmitting" type="submit" class="btn btn-outline-primary mx-2" [disabled]="!addTaskForm.valid">Add</button>
+                <button type="button" *ngIf="isSubmitting" class="btn btn-outline-primary mx-2" disabled>Adding
+                    task...</button>
+                <button type="reset" class="btn btn-outline-danger" (click)="resetForm()">Reset</button>
             </div>
         </form>
     </div>

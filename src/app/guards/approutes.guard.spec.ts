@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ResolveGuard } from './resolve.guard';
+import { ApproutesGuard } from './approutes.guard';
 
-describe('ResolveGuard', () => {
-  let guard: ResolveGuard;
+describe('ApproutesGuard', () => {
+  let guard: ApproutesGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    guard = TestBed.inject(ResolveGuard);
+    guard = TestBed.inject(ApproutesGuard);
   });
 
   it('should be created', () => {

@@ -1,28 +1,29 @@
 <!-- main content of page -->
-<div class="row" style="flex-wrap: nowrap;">
-    <div class="col-8">
-        <div class="container my-4 mx-2">
-            <h1>Add a new Routine</h1>
+<form [formGroup]="addRoutineForm" (ngSubmit)="addNewRoutine(addRoutineForm)" class="py-0">
+    <div class="row" style="flex-wrap: nowrap;">
+        <div class="col-8">
+            <div class="container my-4 mx-2">
+                <h1>Add a new Routine</h1>
+            </div>
         </div>
-    </div>
-    <div class="col-4 text-center align-self-center">
-        <div class="container">
-            <div class="btn-group" role="group">
-                <button [ngClass]="isButton1Active? 'btn btn-dark': 'btn btn-outline-dark'"
-                    (click)="showForm1()">Daily</button>
-                <button [ngClass]="isButton2Active? 'btn btn-dark': 'btn btn-outline-dark'"
-                    (click)="showForm2()">Weekly</button>
-                <button [ngClass]="isButton3Active? 'btn btn-dark': 'btn btn-outline-dark'"
-                    (click)="showForm3()">Monthly</button>
-                <button [ngClass]="isButton4Active? 'btn btn-dark': 'btn btn-outline-dark'"
-                    (click)="showForm4()">Yearly</button>
+        <div class="col-4 text-center align-self-center">
+            <div class="container">
+                <div class="btn-group" role="group">
+                    <button type="button" [ngClass]="routineType1? 'btn btn-dark': 'btn btn-outline-dark'"
+                        (click)="showForm1()">Daily</button>
+                    <button type="button" [ngClass]="routineType2? 'btn btn-dark': 'btn btn-outline-dark'"
+                        (click)="showForm2()">Weekly</button>
+                    <button type="button" [ngClass]="routineType3? 'btn btn-dark': 'btn btn-outline-dark'"
+                        (click)="showForm3()">Monthly</button>
+                    <button type="button" [ngClass]="routineType4? 'btn btn-dark': 'btn btn-outline-dark'"
+                        (click)="showForm4()">Yearly</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="container align-items-center mx-2">
-    <div id="mainContent" class="px-4 border" style="overflow-y: scroll; height: 75vh; width: 80vw;">
-        <form [formGroup]="addRoutineForm" class="my-4" (ngSubmit)="addNewRoutine(addRoutineForm)">
+    <div class="container align-items-center mx-2">
+        <div id="mainContent" class="p-4 border" style="overflow-y: scroll; height: 75vh; width: 80vw;">
+            
             <div class="form-group">
                 <label>Routine Name</label>
                 <input formControlName="taskname" type="text" class="form-control"
@@ -34,30 +35,31 @@
                 <label>Priority</label>
                 <select formControlName="priority" class="form-control"
                     [ngClass]="{'is-invalid': addRoutineForm.get('priority').errors && (addRoutineForm.get('priority').touched || addRoutineForm.get('priority').dirty)}">
-                    <option>Very High</option>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
+                    <option value="1">Very High</option>
+                    <option value="2">High</option>
+                    <option value="3">Medium</option>
+                    <option value="4">Low</option>
                 </select>
                 <span *ngIf="addRoutineForm.get('priority').errors" class="invalid-feedback">Priority is
                     required.</span>
             </div>
-            <div *ngIf="isDiv1Active" class="form-group">
+
+            <div *ngIf="routineType1" class="form-group">
                 <label>Time of the day</label>
                 <div class="row">
                     <div class="col-2">
                         <label>HH</label>
-                        <select formControlName="hour" class="form-control"
-                            [ngClass]="{'is-invalid': addRoutineForm.get('hour').errors && (addRoutineForm.get('hour').touched || addRoutineForm.get('hour').dirty)}">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
+                        <select formControlName="hh" class="form-control"
+                            [ngClass]="{'is-invalid': addRoutineForm.get('hh').errors && (addRoutineForm.get('hh').touched || addRoutineForm.get('hh').dirty)}">
+                            <option value="01">1</option>
+                            <option value="02">2</option>
+                            <option value="03">3</option>
+                            <option value="04">4</option>
+                            <option value="05">5</option>
+                            <option value="06">6</option>
+                            <option value="07">7</option>
+                            <option value="08">8</option>
+                            <option value="09">9</option>
                             <option value="10">10</option>
                             <option value="11">11</option>
                             <option value="12">12</option>
@@ -65,17 +67,18 @@
                     </div>
                     <div class="col-2">
                         <label>MM</label>
-                        <select formControlName="mins" class="form-control"
-                            [ngClass]="{'is-invalid': addRoutineForm.get('mins').errors && (addRoutineForm.get('mins').touched || addRoutineForm.get('mins').dirty)}">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
+                        <select formControlName="mm" class="form-control"
+                            [ngClass]="{'is-invalid': addRoutineForm.get('mm').errors && (addRoutineForm.get('mm').touched || addRoutineForm.get('mm').dirty)}">
+                            <option value="00">1</option>
+                            <option value="01">1</option>
+                            <option value="02">2</option>
+                            <option value="03">3</option>
+                            <option value="04">4</option>
+                            <option value="05">5</option>
+                            <option value="06">6</option>
+                            <option value="07">7</option>
+                            <option value="08">8</option>
+                            <option value="09">9</option>
                             <option value="10">10</option>
                             <option value="11">11</option>
                             <option value="12">22</option>
@@ -133,48 +136,49 @@
                         <label for="">AM/PM</label>
                         <select formControlName="ampm" class="form-control"
                             [ngClass]="{'is-invalid': addRoutineForm.get('ampm').errors && (addRoutineForm.get('ampm').touched || addRoutineForm.get('ampm').dirty)}">
-                            <option value="am">AM</option>
-                            <option value="pm">PM</option>
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
                         </select>
                     </div>
                 </div>
                 <div>
                     <small
-                        *ngIf="(addRoutineForm.get('hour').errors && (addRoutineForm.get('hour').touched || addRoutineForm.get('hour').dirty)) || 
-                        (addRoutineForm.get('mins').errors && (addRoutineForm.get('mins').touched || addRoutineForm.get('mins').dirty)) || 
-                        (addRoutineForm.get('ampm').errors && (addRoutineForm.get('ampm').touched || addRoutineForm.get('ampm').dirty))"
+                        *ngIf="(addRoutineForm.get('hh').errors && (addRoutineForm.get('hh').touched || addRoutineForm.get('hh').dirty)) || 
+                                    (addRoutineForm.get('mm').errors && (addRoutineForm.get('mm').touched || addRoutineForm.get('mm').dirty)) || 
+                                    (addRoutineForm.get('ampm').errors && (addRoutineForm.get('ampm').touched || addRoutineForm.get('ampm').dirty))"
                         class="text-danger">Please select valid time.</small>
                 </div>
             </div>
 
-            <div *ngIf="isDiv2Active" class="form-group">
+            <div *ngIf="routineType2" class="form-group">
                 <div class="row">
                     <div class="col-2">
-                        <label>Select Week-Day</label>
+                        <label>Week-Day</label>
                         <select formControlName="day" class="form-control"
                             [ngClass]="{'is-invalid': addRoutineForm.get('day').errors && (addRoutineForm.get('day').touched || addRoutineForm.get('day').dirty)}">
-                            <option value="sunday">Sunday</option>
-                            <option value="monday">Monday</option>
-                            <option value="tuesday">Tuesday</option>
-                            <option value="wednesday">Wednesday</option>
-                            <option value="thursday">Thursday</option>
-                            <option value="friday">Friday</option>
-                            <option value="saturday">Saturday</option>
+                            <option value="0">Sunday</option>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
                         </select>
-                        <span *ngIf="addRoutineForm.get('day').errors" class="invalid-feedback">Day is required.</span>
+                        <span *ngIf="addRoutineForm.get('day').errors" class="invalid-feedback">Day is
+                            required.</span>
                     </div>
                     <div class="col-2">
                         <label>HH</label>
-                        <select formControlName="hour" class="form-control">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
+                        <select formControlName="hh" class="form-control">
+                            <option value="01">1</option>
+                            <option value="02">2</option>
+                            <option value="03">3</option>
+                            <option value="04">4</option>
+                            <option value="05">5</option>
+                            <option value="06">6</option>
+                            <option value="07">7</option>
+                            <option value="08">8</option>
+                            <option value="09">9</option>
                             <option value="10">10</option>
                             <option value="11">11</option>
                             <option value="12">12</option>
@@ -182,16 +186,17 @@
                     </div>
                     <div class="col-2">
                         <label>MM</label>
-                        <select formControlName="mins" class="form-control">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
+                        <select formControlName="mm" class="form-control">
+                            <option value="00">1</option>
+                            <option value="01">1</option>
+                            <option value="02">2</option>
+                            <option value="03">3</option>
+                            <option value="04">4</option>
+                            <option value="05">5</option>
+                            <option value="06">6</option>
+                            <option value="07">7</option>
+                            <option value="08">8</option>
+                            <option value="09">9</option>
                             <option value="10">10</option>
                             <option value="11">11</option>
                             <option value="12">22</option>
@@ -255,11 +260,11 @@
                 </div>
             </div>
 
-            <div *ngIf="isDiv3Active" class="form-group">
+            <div *ngIf="routineType3" class="form-group">
                 <div class="col-3 px-0">
                     <label>Select the Day</label>
-                    <select formControlName="day" class="form-control"
-                        [ngClass]="{'is-invalid': addRoutineForm.get('day').errors && (addRoutineForm.get('day').touched || addRoutineForm.get('day').dirty)}">
+                    <select formControlName="date" class="form-control"
+                        [ngClass]="{'is-invalid': addRoutineForm.get('date').errors && (addRoutineForm.get('date').touched || addRoutineForm.get('date').dirty)}">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -269,7 +274,7 @@
                         <option value="7">7</option>
                         <option value="8">8</option>
                         <option value="9">9</option>
-                        <option value="10">0</option>
+                        <option value="10">10</option>
                         <option value="11">11</option>
                         <option value="12">12</option>
                         <option value="13">13</option>
@@ -289,33 +294,36 @@
                         <option value="27">27</option>
                         <option value="28">28</option>
                     </select>
-                    <span *ngIf="addRoutineForm.get('day').errors" class="invalid-feedback">Day is required.</span>
+                    <span *ngIf="addRoutineForm.get('date').errors" class="invalid-feedback">Day is
+                        required.</span>
                 </div>
             </div>
-            <div *ngIf="isDiv4Active" class="form-group">
+            <div *ngIf="routineType4" class="form-group">
                 <div class="row">
                     <div class="col-3">
                         <label>Select the Month</label>
                         <select formControlName="month" class="form-control"
                             [ngClass]="{'is-invalid': addRoutineForm.get('month').errors && (addRoutineForm.get('month').touched || addRoutineForm.get('month').dirty)}">
-                            <option value="jan">January</option>
-                            <option value="feb">February</option>
-                            <option value="mar">March</option>
-                            <option value="apr">April</option>
-                            <option value="may">May</option>
-                            <option value="jun">June</option>
-                            <option value="jul">July</option>
-                            <option value="aug">Augest</option>
-                            <option value="sep">September</option>
-                            <option value="oct">October</option>
-                            <option value="nov">November</option>
-                            <option value="dec">December</option>
+                            <option value="0">January</option>
+                            <option value="1">February</option>
+                            <option value="2">March</option>
+                            <option value="3">April</option>
+                            <option value="4">May</option>
+                            <option value="5">June</option>
+                            <option value="6">July</option>
+                            <option value="7">Augest</option>
+                            <option value="8">September</option>
+                            <option value="9">October</option>
+                            <option value="10">November</option>
+                            <option value="11">December</option>
                         </select>
+                        <span *ngIf="addRoutineForm.get('month').errors" class="invalid-feedback">Month is
+                            required.</span>
                     </div>
                     <div class="col-2">
                         <label>Select the Day</label>
-                        <select formControlName="day" class="form-control"
-                            [ngClass]="{'is-invalid': addRoutineForm.get('day').errors && (addRoutineForm.get('day').touched || addRoutineForm.get('day').dirty)}">
+                        <select formControlName="date" class="form-control"
+                            [ngClass]="{'is-invalid': addRoutineForm.get('date').errors && (addRoutineForm.get('date').touched || addRoutineForm.get('date').dirty)}">
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -325,7 +333,7 @@
                             <option value="7">7</option>
                             <option value="8">8</option>
                             <option value="9">9</option>
-                            <option value="10">0</option>
+                            <option value="10">10</option>
                             <option value="11">11</option>
                             <option value="12">12</option>
                             <option value="13">13</option>
@@ -345,27 +353,29 @@
                             <option value="27">27</option>
                             <option value="28">28</option>
                         </select>
+                        <span *ngIf="addRoutineForm.get('date').errors" class="invalid-feedback">Day is
+                            required.</span>
                     </div>
-                </div>
-                <div>
-                    <small
-                        *ngIf="(addRoutineForm.get('month').errors && (addRoutineForm.get('month').touched || addRoutineForm.get('month').dirty)) || 
-                        (addRoutineForm.get('day').errors && (addRoutineForm.get('day').touched || addRoutineForm.get('day').dirty))"
-                        class="text-danger">Please select both month and day.</small>
                 </div>
             </div>
             <div class="form-group">
                 <label>Routine Description</label>
-                <textarea formControlName="description" class="form-control" rows="5"></textarea>
+                <textarea formControlName="description" class="form-control" rows="05"></textarea>
+            </div>
+            <div *ngIf="submissionSuccessful" id="addTaskAlert">
+                <div class="alert alert-success alert-dismissable" id="addTaskAlert2">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="submissionSuccessful"
+                        (click)="submissionSuccessful = !submissionSuccessful">&times;</button>
+                    Routine added successfully.
+                </div>
             </div>
             <div class="container text-center">
-                <!-- <button *ngIf="submitting" class="btn btn-primary mx-2" disabled>
-                    <i class="fa fa-spinner fa-spin"></i>
-                    Adding Task</button> -->
-                <button class="btn btn-primary mx-2" [disabled]="!addRoutineForm.valid" type="submit">
-                    Add Routine</button>
-                <button class="btn btn-outline-danger mx-2" type="reset">Reset</button>
+                <button *ngIf="!isSubmitting" type="submit" class="btn btn-outline-primary mx-2"
+                    [disabled]="!addRoutineForm.valid">Add</button>
+                <button type="button" *ngIf="isSubmitting" class="btn btn-outline-primary mx-2" disabled>Adding
+                    routine...</button>
+                <button type="reset" class="btn btn-outline-danger" (click)="resetForm()">Reset</button>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>

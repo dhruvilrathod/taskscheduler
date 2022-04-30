@@ -1,1 +1,523 @@
-<p>timetable works!</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<!-- Edit task modal -->
+<div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalLabel" *ngIf="!isRoutine">Task Details</h5>
+                <h5 class="modal-title" id="taskModalLabel" *ngIf="isRoutine">Routine Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mt-2 mb-3 py-0">
+                <form *ngIf="!isRoutine" [formGroup]="taskEditForm" (ngSubmit)="updateTask(taskEditForm)" class="py-0">
+                    <div class="form-group">
+                        <label>Task Name</label>
+                        <input type="text"
+                            [ngClass]="{'is-invalid': taskEditForm.get('taskname').errors && (taskEditForm.get('taskname').touched || taskEditForm.get('taskname').dirty)}"
+                            formControlName="taskname" class="form-control">
+                        <span *ngIf="taskEditForm.get('taskname').errors" class="invalid-feedback">Task Name is
+                            necessary.</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Priority</label>
+                        <select formControlName="priority" class="form-control"
+                            [ngClass]="{'is-invalid': taskEditForm.get('priority').errors && (taskEditForm.get('priority').touched || taskEditForm.get('priority').dirty)}">
+                            <option value="1">Very High</option>
+                            <option value="2">High</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Low</option>
+                        </select>
+                        <span *ngIf="taskEditForm.get('priority').errors" class="invalid-feedback">Priority is
+                            required.</span>
+
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input formControlName="startdate" class="form-control" type="date" min="{{today}}"
+                            (change)="checkSpecialDate($event)"
+                            (change)="verifytDeadline($event)"
+                            [ngClass]="{'is-invalid': taskEditForm.get('startdate').errors && (taskEditForm.get('startdate').touched || taskEditForm.get('startdate').dirty)}">
+                        <span *ngIf="taskEditForm.get('startdate').errors" class="invalid-feedback">Enter a valid
+                            date.</span>
+                    </div>
+                    <div *ngIf="isSpecialDate" class="alert alert-primary" role="alert">
+                        <strong>Holiday Alert! </strong> {{occasion}}
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input formControlName="deadline" class="form-control" type="date" min="{{today}}"
+                            (change)="verifytDeadline($event)"
+                            [ngClass]="{'is-invalid': taskEditForm.get('deadline').errors && (taskEditForm.get('deadline').touched || taskEditForm.get('deadline').dirty)}">
+                        <span *ngIf="taskEditForm.get('deadline').errors" class="invalid-feedback">Enter a valid
+                            date.</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Description</label>
+                        <textarea formControlName="description" class="form-control" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input formControlName="done" class="form-check-input" type="checkbox" id="checkBoxInput"
+                                value="task.is_completed" [checked]="taskEditForm.get('done').value == 'true'">
+                            <label *ngIf="taskEditForm.get('done').value" class="form-check-label" for="checkBoxInput">
+                                Marked as Done
+                            </label>
+                            <label *ngIf="!taskEditForm.get('done').value" class="form-check-label" for="checkBoxInput">
+                                Mark as Done
+                            </label>
+                        </div>
+                    </div>
+                    <div class="container text-center">
+                        <button type="submit" *ngIf="!isSubmitting" class="btn btn-outline-primary mx-2"
+                            [disabled]="!taskEditForm.valid">Update</button>
+                        <button type="button" *ngIf="isSubmitting" class="btn btn-outline-primary mx-2"
+                            disabled>Updating...</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+                <form *ngIf="isRoutine" [formGroup]="routineEditForm" (ngSubmit)="updateTask(routineEditForm)"
+                    class="py-0">
+
+                    <div class="form-group">
+                        <label>Routine Name</label>
+                        <input formControlName="taskname" type="text" class="form-control"
+                            [ngClass]="{'is-invalid': routineEditForm.get('taskname').errors && (routineEditForm.get('taskname').touched || routineEditForm.get('taskname').dirty)}">
+                        <span *ngIf="routineEditForm.get('taskname').errors" class="invalid-feedback">Routine Name is
+                            required.</span>
+                    </div>
+                    <div class="form-group">
+                        <span class="my-1 badge badge-secondary" data-toggle="tooltip" data-bs-placement="right"
+                            title="Monthly Routine" *ngIf="routineEditForm.get('routine_type').value == '1'"
+                            style="user-select: none;">Daily Routine</span>
+                        <span class="my-1 badge badge-secondary" data-toggle="tooltip" data-bs-placement="right"
+                            title="Monthly Routine" *ngIf="routineEditForm.get('routine_type').value == '2'"
+                            style="user-select: none;">Weekly
+                            Routine</span>
+                        <span class="my-1 badge badge-secondary" data-toggle="tooltip" data-bs-placement="right"
+                            title="Monthly Routine" *ngIf="routineEditForm.get('routine_type').value == '3'"
+                            style="user-select: none;">Monthly
+                            Routine</span>
+                        <span class="my-1 badge badge-secondary" data-toggle="tooltip" data-bs-placement="right"
+                            title="Monthly Routine" *ngIf="routineEditForm.get('routine_type').value == '4'"
+                            style="user-select: none;">Yearly
+                            Routine</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select formControlName="priority" class="form-control"
+                            [ngClass]="{'is-invalid': routineEditForm.get('priority').errors && (routineEditForm.get('priority').touched || routineEditForm.get('priority').dirty)}">
+                            <option value="1">Very High</option>
+                            <option value="2">High</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Low</option>
+                        </select>
+                        <span *ngIf="routineEditForm.get('priority').errors" class="invalid-feedback">Priority is
+                            required.</span>
+                    </div>
+
+                    <div *ngIf="routineType1" class="form-group">
+                        <label>Time of the day</label>
+                        <div class="row">
+                            <div class="col-2">
+                                <label>HH</label>
+                                <select formControlName="hh" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('hh').errors && (routineEditForm.get('hh').touched || routineEditForm.get('hh').dirty)}">
+                                    <option value="01">1</option>
+                                    <option value="02">2</option>
+                                    <option value="03">3</option>
+                                    <option value="04">4</option>
+                                    <option value="05">5</option>
+                                    <option value="06">6</option>
+                                    <option value="07">7</option>
+                                    <option value="08">8</option>
+                                    <option value="09">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <label>MM</label>
+                                <select formControlName="mm" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('mm').errors && (routineEditForm.get('mm').touched || routineEditForm.get('mm').dirty)}">
+                                    <option value="00">1</option>
+                                    <option value="01">1</option>
+                                    <option value="02">2</option>
+                                    <option value="03">3</option>
+                                    <option value="04">4</option>
+                                    <option value="05">5</option>
+                                    <option value="06">6</option>
+                                    <option value="07">7</option>
+                                    <option value="08">8</option>
+                                    <option value="09">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">22</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    <option value="32">32</option>
+                                    <option value="33">33</option>
+                                    <option value="34">34</option>
+                                    <option value="35">35</option>
+                                    <option value="36">36</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                    <option value="42">42</option>
+                                    <option value="43">43</option>
+                                    <option value="44">44</option>
+                                    <option value="45">45</option>
+                                    <option value="46">46</option>
+                                    <option value="47">47</option>
+                                    <option value="48">48</option>
+                                    <option value="49">49</option>
+                                    <option value="50">50</option>
+                                    <option value="51">51</option>
+                                    <option value="52">52</option>
+                                    <option value="53">53</option>
+                                    <option value="54">54</option>
+                                    <option value="55">55</option>
+                                    <option value="56">56</option>
+                                    <option value="57">57</option>
+                                    <option value="58">58</option>
+                                    <option value="59">59</option>
+                                    <option value="60">60</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <label for="">AM/PM</label>
+                                <select formControlName="ampm" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('ampm').errors && (routineEditForm.get('ampm').touched || routineEditForm.get('ampm').dirty)}">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <small
+                                *ngIf="(routineEditForm.get('hh').errors && (routineEditForm.get('hh').touched || routineEditForm.get('hh').dirty)) || 
+                                            (routineEditForm.get('mm').errors && (routineEditForm.get('mm').touched || routineEditForm.get('mm').dirty)) || 
+                                            (routineEditForm.get('ampm').errors && (routineEditForm.get('ampm').touched || routineEditForm.get('ampm').dirty))"
+                                class="text-danger">Please select valid time.</small>
+                        </div>
+                    </div>
+
+                    <div *ngIf="routineType2" class="form-group">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>Week-Day</label>
+                                <select formControlName="day" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('day').errors && (routineEditForm.get('day').touched || routineEditForm.get('day').dirty)}">
+                                    <option value="0">Sunday</option>
+                                    <option value="1">Monday</option>
+                                    <option value="2">Tuesday</option>
+                                    <option value="3">Wednesday</option>
+                                    <option value="4">Thursday</option>
+                                    <option value="5">Friday</option>
+                                    <option value="6">Saturday</option>
+                                </select>
+                                <span *ngIf="routineEditForm.get('day').errors" class="invalid-feedback">Day is
+                                    required.</span>
+                            </div>
+                            <div class="col-2">
+                                <label>HH</label>
+                                <select formControlName="hh" class="form-control">
+                                    <option value="01">1</option>
+                                    <option value="02">2</option>
+                                    <option value="03">3</option>
+                                    <option value="04">4</option>
+                                    <option value="05">5</option>
+                                    <option value="06">6</option>
+                                    <option value="07">7</option>
+                                    <option value="08">8</option>
+                                    <option value="09">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <label>MM</label>
+                                <select formControlName="mm" class="form-control">
+                                    <option value="00">1</option>
+                                    <option value="01">1</option>
+                                    <option value="02">2</option>
+                                    <option value="03">3</option>
+                                    <option value="04">4</option>
+                                    <option value="05">5</option>
+                                    <option value="06">6</option>
+                                    <option value="07">7</option>
+                                    <option value="08">8</option>
+                                    <option value="09">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">22</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    <option value="32">32</option>
+                                    <option value="33">33</option>
+                                    <option value="34">34</option>
+                                    <option value="35">35</option>
+                                    <option value="36">36</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                    <option value="42">42</option>
+                                    <option value="43">43</option>
+                                    <option value="44">44</option>
+                                    <option value="45">45</option>
+                                    <option value="46">46</option>
+                                    <option value="47">47</option>
+                                    <option value="48">48</option>
+                                    <option value="49">49</option>
+                                    <option value="50">50</option>
+                                    <option value="51">51</option>
+                                    <option value="52">52</option>
+                                    <option value="53">53</option>
+                                    <option value="54">54</option>
+                                    <option value="55">55</option>
+                                    <option value="56">56</option>
+                                    <option value="57">57</option>
+                                    <option value="58">58</option>
+                                    <option value="59">59</option>
+                                    <option value="60">60</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <label>AM/PM</label>
+                                <select formControlName="ampm" class="form-control">
+                                    <option value="am">AM</option>
+                                    <option value="pm">PM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="routineType3" class="form-group">
+                        <div class="col-3 px-0">
+                            <label>Select the Day</label>
+                            <select formControlName="date" class="form-control"
+                                [ngClass]="{'is-invalid': routineEditForm.get('date').errors && (routineEditForm.get('date').touched || routineEditForm.get('date').dirty)}">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">0</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                            </select>
+                            <span *ngIf="routineEditForm.get('date').errors" class="invalid-feedback">Day is
+                                required.</span>
+                        </div>
+                    </div>
+                    <div *ngIf="routineType4" class="form-group">
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Select the Month</label>
+                                <select formControlName="month" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('month').errors && (routineEditForm.get('month').touched || routineEditForm.get('month').dirty)}">
+                                    <option value="0">January</option>
+                                    <option value="1">February</option>
+                                    <option value="2">March</option>
+                                    <option value="3">April</option>
+                                    <option value="4">May</option>
+                                    <option value="5">June</option>
+                                    <option value="6">July</option>
+                                    <option value="7">Augest</option>
+                                    <option value="8">September</option>
+                                    <option value="9">October</option>
+                                    <option value="10">November</option>
+                                    <option value="11">December</option>
+                                </select>
+                                <span *ngIf="routineEditForm.get('month').errors" class="invalid-feedback">Month is
+                                    required.</span>
+                            </div>
+                            <div class="col-2">
+                                <label>Select the Day</label>
+                                <select formControlName="date" class="form-control"
+                                    [ngClass]="{'is-invalid': routineEditForm.get('date').errors && (routineEditForm.get('date').touched || routineEditForm.get('date').dirty)}">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">0</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                </select>
+                                <span *ngIf="routineEditForm.get('date').errors" class="invalid-feedback">Day is
+                                    required.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Routine Description</label>
+                        <textarea formControlName="description" class="form-control" rows="05"></textarea>
+                    </div>
+
+                    <div class="container text-center">
+                        <button type="submit" *ngIf="!isSubmitting" class="btn btn-outline-primary mx-2"
+                            [disabled]="!routineEditForm.valid">Update</button>
+                        <button type="button" *ngIf="isSubmitting" class="btn btn-outline-primary mx-2"
+                            disabled>Updating...</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf='loading' class="d-flex justify-content-center align-items-center" style="height: 92vh;">
+    <div class="spinner-border" style="width: 10vw; height: 10vw; color: blue; border-width: 0.5vw;" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<!-- main content of page -->
+<div *ngIf="!loading">
+    <div class="row" style="flex-wrap: nowrap;">
+        <div class="col-9">
+            <div class="container my-4 mx-2">
+                <h1>Weekly Time-Table</h1>
+            </div>
+        </div>
+        <div class="col-3 text-center align-self-center">
+            <button class="btn btn-outline-dark" [disabled]="middleDayOfWeek.getDate() == today.getDate()"
+                (click)="currentWeekButton()">Current Week</button>
+        </div>
+    </div>
+    <div class="container align-items-center mx-2">
+        <div id="mainContent" class="p-4 border" style="overflow-y: scroll; height: 75vh; width: 80vw;">
+            <div class="container align-self-center" style="margin: 0px; padding: 0px;">
+                <div class="card w-100">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-8">
+                                <h3 class="my-2">{{firstDayOfWeek}} to {{lastDayOfWeek}}</h3>
+                            </div>
+                            <div class="col-2 align-self-center">
+                                <button class="btn btn-outline-dark btn-block" (click)='previousWeekButton()'>
+                                    < Previous Week</button>
+                            </div>
+                            <div class="col-2 align-self-center">
+                                <button class="btn btn-outline-dark btn-block"
+                                    (click)='nextWeekButton()'>Next Week ></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="container" id="calendar">
+                            <div class="row bg-dark text-light py-2">
+                                <th class="col" *ngFor="let day of timetableDates; let i = index">{{days_name[i]}} <br> {{day.month}} {{day.date}}</th>
+                            </div>
+                            <div *ngIf="weeklyTasks1.length == 0" class="row" style="width: 100%;">
+                                <div class="d-flex col-12 justify-content-center align-items-center border" style="height: 50vh;">
+                                    <h1 class="align-self-center text-muted">Nothing to Show. <br> Add some tasks ;)</h1>
+                                </div>
+                            </div>
+                            <div *ngIf="weeklyTasks.length > 0">
+                                <div class="row" *ngFor='let arr of weeklyTasks1, let i = index'>
+                                    <div class="col py-3 border border-collapse" *ngFor='let task of arr'
+                                        (mouseenter)='hoverEnterFunction($event)' (mouseleave)='hoverLeaveFunction($event)'
+                                        data-toggle="modal" data-target="#taskModal"
+                                        [ngStyle]="{'text-decoration': task.is_completed==true?'line-through':''}"
+                                        (click)='editTaskDetails(task)'[disabled] ="task == ''">
+                                        <span *ngIf="task != ''">
+                                            <span
+                                                [ngStyle]="{'color' : task.prno == '1'? 'red' : (task.prno =='2'?'orange':(task.prno == '3'? 'yellow': (task.prno == '4'? 'greenyellow' : 'black')))}"
+                                            >● </span>{{task.taskname}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

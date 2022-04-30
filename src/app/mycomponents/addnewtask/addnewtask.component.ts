@@ -1,6 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-addnewtask',
@@ -9,9 +10,11 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class AddnewtaskComponent implements OnInit {
-  fileNames = [];
   addTaskForm: FormGroup;
-  public submitting: boolean = false;
+  public isSubmitting: boolean = false;
+  public errorMessage: string = "";
+  public isError = false;
+  public submissionSuccessful: boolean = false;
   public specialDates: any;
   public today: any;
   public isSpecialDate: boolean = false;
@@ -19,170 +22,114 @@ export class AddnewtaskComponent implements OnInit {
   public selectedMonth: string;
   public selectedYear: number;
   public occasion: string;
-  public dropMessage: string = "Drop Files Here";
-  public isDragOver: boolean;
-  public isDragEnter: boolean;
-  public isDragLeave: boolean;
-  public isDropped: boolean;
+  public loading: boolean = false;
+  public month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public days_name = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 
   constructor(
     private formbuilder: FormBuilder,
-    private activatedRoute: ActivatedRoute
-  ) { }
+    private http: HttpClient,
+    private titleService: Title,
+  ) { this.titleService.setTitle('Add New Task') }
 
   ngOnInit(): void {
+    this.loading = true;
+    this.http.get("https://us-central1-smarttaskscheduler.cloudfunctions.net/app/api/specialdates", { headers: { 'auth-token': localStorage.getItem('auth-token') } }).subscribe((data) => {
+      this.specialDates = data;
+      this.loading = false;
+    }, (e) => {
+      //console.log(e);
+    });
     this.formBuildFunction();
-    this.datePickerFunction();
+    this.todayDateValidation();
   }
 
-  formBuildFunction(){
-    console.log('form build function is called');
+  formBuildFunction() {
+    //console.log('form build function is called');
     this.addTaskForm = this.formbuilder.group({
       taskname: ['', Validators.required],
       priority: ['', Validators.required],
-      date: ['', Validators.required],
+      startdate: ['', Validators.required],
+      deadline: ['', Validators.required],
       description: [''],
-      attechment: []
+      done: [],
     });
   }
 
-  onFileSelected(event) {
-    for (var i = 0; i < event.target.files.length; i++) {
-      var selectedFile = event.target.files[i];
-      this.fileNames.push(selectedFile);
-    }
-    console.log(this.fileNames);
-    this.dropMessage ="";
-  }
-  
   resetForm() {
-    console.log('resetForm function is called');
+    //console.log('resetForm function is called');
     this.formBuildFunction();
-    this.fileNames = [];
     this.isSpecialDate = false;
-    this.dropMessage = "Drop Files Here";
-    this.isDropped = false;
-    this.isDragEnter = false;
-    this.isDragLeave = false;
-    this.isDragOver = false;
   }
 
-  // working function
 
   addNewTask(newTaskData) {
-    console.log(this.fileNames);
-    console.log(newTaskData.value);
-    newTaskData.value.attechment = this.fileNames;
-    console.log(newTaskData.value.attechment);
-    this.submitting = true;
-    this.submitting = false;
-    console.log('if statement inside for loop' + this.submitting);
-    this.fileNames = [];
-    this.resetForm();
-    newTaskData.reset();
-  }
-  //assumption:
-  // this function is changing the global variable value once it completely finish execution.
-
-  onDrop(event: any){
-    console.log("file dropped function is called.");
-    event.preventDefault();
-    event.stopPropagation();
-    console.log(event);
-    this.dropMessage ="";
-    this.isDropped = true;
-    this.isDragEnter = false;
-    this.isDragLeave = false;
-    this.isDragOver = false;
-    for (var i = 0; i < event.dataTransfer.files.length; i++) {
-      var selectedFile = event.dataTransfer.files[i];
-      this.fileNames.push(selectedFile);
+    this.isSubmitting = true;
+    var date_start = this.month_names[new Date(newTaskData.value.startdate).getMonth()] + ' ' + newTaskData.value.startdate.split('-')[2] + ', ' + newTaskData.value.startdate.split('-')[0];
+    var deadline = this.month_names[new Date(newTaskData.value.deadline).getMonth()] + ' ' + newTaskData.value.deadline.split('-')[2] + ', ' + newTaskData.value.deadline.split('-')[0];
+    var newTask = {
+      taskname: newTaskData.value.taskname,
+      prno: newTaskData.value.priority,
+      date_start: date_start,
+      deadline: deadline,
+      date_completed: "",
+      description: newTaskData.value.description,
+      time: "",
+      routine_type: "0",
+      is_completed: false
     }
-    console.log(this.fileNames);
-    this.dropMessage ="";
-  }
-  dragenter(event: any){
-    console.log('drag enter is called');
-    event.preventDefault();
-    this.isDropped = false;
-    this.isDragEnter = true;
-    this.isDragLeave = false;
-    this.isDragOver = false;
-    // document.getElementById('dropDiv').classList.add('bg-info');
-  };
-  dragleave(event: any){
-    console.log('drag leave is called');
-    event.preventDefault();
-    this.isDropped = false;
-    this.isDragEnter = false;
-    this.isDragLeave = true;
-    this.isDragOver = false;
-    // document.getElementById('dropDiv').classList.remove('bg-info');
-  };
-  dragover(event: any){
-    console.log('drag over is called');
-    event.preventDefault();
-    this.isDropped = false;
-    this.isDragEnter = false;
-    this.isDragLeave = false;
-    this.isDragOver = true;
-  };
-
-  removeFile(i) {
-    console.log('file to remove: ' + this.fileNames[i].name);
-    this.fileNames.splice(i, 1);
-    if(this.fileNames.length === 0){
-      this.dropMessage = "Drop Files Here";
-    }
+    this.http.post('https://us-central1-smarttaskscheduler.cloudfunctions.net/app/api/tasks/addNewTask', newTask, { headers: { 'auth-token': localStorage.getItem('auth-token') } }).subscribe((data) => {
+      //console.log(data);
+      this.isSubmitting = false;
+      this.submissionSuccessful = true;
+      this.isError = false;
+      this.resetForm();
+    }, (err) => {
+      this.submissionSuccessful = false;
+      this.isError = true;
+      this.errorMessage = err;
+      this.isSubmitting = false;
+    });
   }
 
-  datePickerFunction(){
-    console.log('date piker function is called');
+  //function to make sure that user only select future dates for new tasks
+  todayDateValidation() {
+    //console.log('date piker function is called');
     var today = new Date();
     var date1 = ('0' + today.getDate().toString()).slice(-2);
-    // console.log(date1); 
     var month1 = ('0' + (today.getMonth() + 1).toString()).slice(-2);
-    // console.log(month1);
     var year1 = today.getFullYear();
     this.today = year1 + '-' + month1 + '-' + date1;
-    // console.log(this.today);
+  }
+
+  verifytDeadline(e: any) {
+    if (new Date(this.addTaskForm.get('startdate').value).getTime() > new Date(this.addTaskForm.get('deadline').value).getTime()) {
+      this.addTaskForm.get('deadline').setErrors({ notEquivalent: 'ture' });
+    }
   }
 
   checkSpecialDate(tdate) {
-    console.log(tdate.value);
-    var d1 = new Date(tdate.value);
-    console.log('selected date: ' + d1.toString());
-    this.specialDates = this.activatedRoute.snapshot.data['specialDates'];
-    console.log(this.specialDates);
-    console.log(this.specialDates.length);
-
-    // console.log('a =' + this.specialDates[0].date);
-
-    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December'];
-    this.selectedDate = d1.getDate();
-    this.selectedMonth = months[d1.getMonth()];
-    this.selectedYear = d1.getFullYear();
-    for (var i = 0; i < this.specialDates.length; i++) {
-      var d2 = new Date(this.specialDates[i].year, this.specialDates[i].month, this.specialDates[i].date, 5, 30, 0)
-      // console.log(d2);
-      if (d1.toString() === d2.toString()) {
-        console.log(d2);
-        console.log(this.selectedDate);
-        console.log(this.selectedMonth);
-        console.log(this.selectedYear);
-        console.log(this.occasion);
-        this.isSpecialDate = true;
-        console.log('if ' + this.isSpecialDate);
+    if (new Date(this.addTaskForm.get('startdate').value).getTime() < new Date().setHours(5, 30, 0, 0)) {
+      this.addTaskForm.get('startdate').setErrors({ notEquivalent: 'ture' });
+    }
+    var d1 = tdate.target.value;
+    //console.log(d1);
+    d1 = d1.split('-')[0] + '-' + d1.split('-')[1] + '-' + d1.split('-')[2];
+    //console.log(d1);
+    for (var i in this.specialDates) {
+      //console.log(this.specialDates[i].date, d1)
+      if (this.specialDates[i].year + '-' + this.specialDates[i].month + '-' + this.specialDates[i].date == d1) {
         this.occasion = this.specialDates[i].occasion;
-        return this.isSpecialDate;
+        this.isSpecialDate = true;
+        break;
       }
       else {
         this.isSpecialDate = false;
-        console.log('else ' + this.isSpecialDate);
+        this.occasion = ""
       }
     }
   }
-
 }
 
 

@@ -1,0 +1,64 @@
+<div class="w-100 text-center py-4">
+    <h1>Smart Task Scheduler</h1>
+</div>
+<div class="w-25 p-5 mx-auto border rounded bg-light">
+    <div class="login-form">
+        <form [formGroup]="registrationForm" (ngSubmit)="submitRegistration(registrationForm)">
+            <h2 class="text-center">Register</h2>
+            <div class="form-group">
+                <input type="email"
+                    [ngClass]="{'is-invalid': registrationForm.get('email').errors && (registrationForm.get('email').touched || registrationForm.get('email').dirty)}"
+                    formControlName="email" class="form-control" class="form-control" placeholder="Email"
+                    required="required">
+                <span *ngIf="registrationForm.get('email').errors" class="invalid-feedback">Please enter valid
+                    email.</span>
+            </div>
+            <div class="form-group">
+                <input type="text"
+                    [ngClass]="{'is-invalid': registrationForm.get('firstname').errors && (registrationForm.get('firstname').touched || registrationForm.get('firstname').dirty)}"
+                    formControlName="firstname" class="form-control" class="form-control" placeholder="First Name"
+                    required="required">
+                <span *ngIf="registrationForm.get('firstname').errors" class="invalid-feedback">Please enter valid First
+                    name.</span>
+            </div>
+            <div class="form-group">
+                <input type="text"
+                    [ngClass]="{'is-invalid': registrationForm.get('lastname').errors && (registrationForm.get('lastname').touched || registrationForm.get('lastname').dirty)}"
+                    formControlName="lastname" class="form-control" class="form-control" placeholder="Last Name"
+                    required="required">
+                <span *ngIf="registrationForm.get('lastname').errors" class="invalid-feedback">Please enter valid Last
+                    name.</span>
+            </div>
+            <div class="form-group">
+                <input type="text"
+                    [ngClass]="{'is-invalid': registrationForm.get('mobilenumber').errors && (registrationForm.get('mobilenumber').touched || registrationForm.get('mobilenumber').dirty)}"
+                    formControlName="mobilenumber" class="form-control" class="form-control" placeholder="Mobile Number"
+                    required="required">
+                <span *ngIf="registrationForm.get('mobilenumber').errors" class="invalid-feedback">Please enter valid
+                    Mobile Number.</span>
+            </div>
+            <div class="form-group">
+                <input type="password"
+                    [ngClass]="{'is-invalid': registrationForm.get('password').errors && (registrationForm.get('password').touched || registrationForm.get('password').dirty)}"
+                    formControlName="password" class="form-control" class="form-control" placeholder="Password"
+                    required="required">
+                <span *ngIf="registrationForm.get('password').errors" class="invalid-feedback">Please enter valid
+                    password.</span>
+            </div>
+            <div class="form-group" *ngIf="!loading">
+                <button type="submit" class="btn btn-outline-primary w-100"
+                    [disabled]="!registrationForm.valid">Login</button>
+            </div>
+            <div class="form-group" *ngIf="loading">
+                <button type="submit" class="btn btn-outline-primary w-100" [disabled]="true">Loggin in...</button>
+            </div>
+        </form>
+        <p class="text-center">Already have an account? <a routerLink="/login">Login Here</a></p>
+        <div *ngIf="successfulRegistration != ''" class="alert alert-success mx-auto" role="alert">
+            {{successfulRegistration}}
+        </div>
+        <div *ngIf="error != ''" class="alert alert-danger mx-auto" role="alert">
+            {{error}}
+        </div>
+    </div>
+</div>

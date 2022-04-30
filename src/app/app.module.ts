@@ -17,9 +17,10 @@ import { MyaccountComponent } from './mycomponents/myaccount/myaccount.component
 import { AboutComponent } from './mycomponents/about/about.component';
 import { ErrorpageComponent } from './mycomponents/errorpage/errorpage.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ResolveGuard } from './guards/resolve.guard';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { RegistrationComponent } from './mycomponents/registration/registration.component';
+import { ApproutesGuard } from './guards/approutes.guard';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { DatePipe } from '@angular/common';
     MyaccountComponent,
     AboutComponent,
     ErrorpageComponent,
+    RegistrationComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,7 +47,7 @@ import { DatePipe } from '@angular/common';
     ReactiveFormsModule,
     FormsModule
   ],
-  providers: [ResolveGuard, DatePipe],
+  providers: [DatePipe, ApproutesGuard],
   bootstrap: [AppComponent],
   exports: [
     FormsModule,

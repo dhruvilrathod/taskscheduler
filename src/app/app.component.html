@@ -1,15 +1,17 @@
-<div *ngIf="loading" style="height: 100vh; width: 100vw;">
-    <div style="opacity: 0.3;">
-        <router-outlet></router-outlet>
-    </div>
-    <div style="width: 100vw; text-align: center; height: 0px;">
-        <div class="spinner-border"
-            style="top: -70vh; position: relative; height: 10vw; width: 10vw; border-width: 0.5vw; color: blue;"
-            role="status">
-            <span class="sr-only">Loading...</span>
+<router-outlet (window:resize)="onResize($event)" *ngIf="screenSizeMatch"></router-outlet>
+<div *ngIf="!screenSizeMatch" (window:resize)="onResize($event)" class="justify-content-center align-items-center p-4 border">
+    <h1 class="align-self-center text-muted">Error: This site is not responsive for small devices.</h1>
+    <div class="px-5 m-3 text-center mx-auto border rounded bg-light border-dark">
+        <div>
+            Project Name: Smart Task Scheduler <br>
+            Team Members: <br>
+            190170107122 Dhruvil Bhavinbhai Rathod <br>
+            190170107116 Kaivalya Maheshbhai Prajapati <br>
+            Team ID: 356627 <br>
+            Guide: Prof. Amit H. Rathod <br>
+            Semester: 6 <br>
+            Subject: Design Engineering <br>
+            Vishwakarma Government Engineering College
         </div>
     </div>
-</div>
-<div *ngIf="!loading">
-    <router-outlet></router-outlet>
 </div>

@@ -9,26 +9,31 @@ import { LoginComponent } from './mycomponents/login/login.component';
 import { MyaccountComponent } from './mycomponents/myaccount/myaccount.component';
 import { MytasksComponent } from './mycomponents/mytasks/mytasks.component';
 import { PiechartComponent } from './mycomponents/piechart/piechart.component';
+import { RegistrationComponent } from './mycomponents/registration/registration.component';
 import { ReportComponent } from './mycomponents/report/report.component';
 import { RoutineComponent } from './mycomponents/routine/routine.component';
 import { TimetableComponent } from './mycomponents/timetable/timetable.component';
-import { DateVerificationResolverService } from './services/date-verification-resolver.service';
-import { DaywiseTasksResolverService } from './services/daywise-tasks-resolver.service';
-import { MytasksResolverService } from './services/mytasks-resolver.service';
+import { ApproutesGuard } from './guards/approutes.guard';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'login', component: LoginComponent },
+  {
+    path: '',
+    redirectTo: localStorage.getItem('auth-token') ? 'home/my-tasks' : 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'login', component: LoginComponent,
+  },
+  { path: 'registration', component: RegistrationComponent },
   {
     path: 'home', component: HomeComponent,
+    canActivate: [ApproutesGuard],
     children: [
       {
         path: 'my-tasks', component: MytasksComponent,
-        resolve: { myTasksDetails: MytasksResolverService }
       },
       {
         path: 'add-task', component: AddnewtaskComponent,
-        resolve: { specialDates: DateVerificationResolverService }
       },
       { path: 'add-routine', component: RoutineComponent },
       {

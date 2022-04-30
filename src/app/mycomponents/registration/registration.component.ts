@@ -1,64 +1,67 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 
-
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-registration',
+  templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css']
 })
-export class LoginComponent implements OnInit {
-  public loginForm: FormGroup;
+export class RegistrationComponent implements OnInit {
+
+  public registrationForm: FormGroup;
   public isError: boolean = false;
   public error: string = "";
   public loading: boolean = false;
+  public successfulRegistration: string = '';
 
   constructor(
     private formbuilder: FormBuilder,
     private auth: AuthService,
-    private router: Router,
     private titleService: Title
-  ) { this.titleService.setTitle('Login') }
+  ) { this.titleService.setTitle('Registration') }
 
   ngOnInit(): void {
     this.formBuildFunction();
   }
 
-  formBuildFunction() {
-    this.loginForm = this.formbuilder.group({
+  formBuildFunction(){
+    this.registrationForm = this.formbuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      firstname: ['', Validators.required],
+      lastname: ['', Validators.required],
+      mobilenumber: ['', [Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(10)]],
+      institution_work: [''],
+      profilepic: [''],
     });
   }
-  submitLogin(data) {
+  submitRegistration(data){
     this.loading = true;
     //console.log(data);
     //console.log(data.value);
-    this.auth.login(data.value).subscribe((token) => {
-      //console.log(token);
+    this.auth.registration(data.value).subscribe((success) => {
+      //console.log(success);
       this.loading = false;
-      localStorage.setItem('auth-token', token);
-      this.router.navigate(['/home/my-tasks']);
+      this.isError = false;
+      this.error = '';
+      this.successfulRegistration = success;
     }, (e) => {
       //console.log(e.error.__proto__.constructor.toString());
       if(e.error.__proto__.constructor.toString() == 'function ProgressEvent() { [native code] }') {
         //console.log('if executed');
         this.loading = false;
         this.isError = true;
+        this.successfulRegistration = '';
         this.error = 'Something went wrong. Please try again later.';
-        localStorage.removeItem('auth-token');
-        this.router.navigate(['']);        
       }
       else {
         //console.log('else executed');
         this.loading = false;
         this.isError = true;
+        this.successfulRegistration = '';
         this.error = e.error;
-        localStorage.removeItem('auth-token');
-        this.router.navigate(['']);
       }
     });
   }

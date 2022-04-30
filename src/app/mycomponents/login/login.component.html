@@ -1,6 +1,48 @@
-this is login component <br>
-username <br> password <br>
-<a routerLink="/home/my-tasks">Login here</a>
-<br>
-registation: <br>
-<a routerLink="/registation">Registation</a>
+<div class="w-100 text-center py-4">
+    <h1>Smart Task Scheduler</h1>
+</div>
+<div class="w-25 p-5 mx-auto border rounded bg-light">
+    <div class="login-form">
+        <form [formGroup]="loginForm" (ngSubmit)="submitLogin(loginForm)">
+            <h2 class="text-center">Log in</h2>
+            <div class="form-group">
+                <input type="text"
+                    [ngClass]="{'is-invalid': loginForm.get('email').errors && (loginForm.get('email').touched || loginForm.get('email').dirty)}"
+                    formControlName="email" class="form-control" class="form-control" placeholder="email"
+                    required="required">
+                <span *ngIf="loginForm.get('email').errors" class="invalid-feedback">Please enter valid email.</span>
+            </div>
+            <div class="form-group">
+                <input type="password"
+                    [ngClass]="{'is-invalid': loginForm.get('password').errors && (loginForm.get('password').touched || loginForm.get('password').dirty)}"
+                    formControlName="password" class="form-control" class="form-control" placeholder="Password"
+                    required="required">
+                <span *ngIf="loginForm.get('password').errors" class="invalid-feedback">Please enter valid
+                    password.</span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger" *ngIf="isError">Error: {{error}}</span>
+            </div>
+            <div class="form-group" *ngIf="!loading">
+                <button type="submit" class="btn btn-outline-primary w-100" [disabled]="!loginForm.valid">Login</button>
+            </div>
+            <div class="form-group" *ngIf="loading">
+                <button type="submit" class="btn btn-outline-primary w-100" [disabled]="true">Loggin in...</button>
+            </div>
+        </form>
+        <p class="text-center"><a routerLink="/registration">Create an Account</a></p>
+    </div>
+</div>
+<div class="w-50 px-5 m-3 text-center mx-auto border rounded bg-light border-dark">
+    <div>
+        Project Name: Smart Task Scheduler <br>
+        Team Members: <br>
+        190170107122 Dhruvil Bhavinbhai Rathod <br>
+        190170107116 Kaivalya Maheshbhai Prajapati <br>
+        Team ID: 356627 <br>
+        Guide: Prof. Amit H. Rathod <br>
+        Semester: 6 <br>
+        Subject: Design Engineering <br>
+        Vishwakarma Government Engineering College
+    </div>
+</div>

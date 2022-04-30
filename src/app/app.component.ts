@@ -1,28 +1,32 @@
-import { Component } from '@angular/core';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { Component, HostListener, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+
+export class AppComponent implements OnInit {
   title = 'taskscheduler';
-  loading: boolean = false;
+  screenSizeMatch: boolean = false;
 
-  constructor(router: Router) {
-    // console.log(this.loading);
-
-    router.events.forEach((event) => {
-      if (event instanceof NavigationStart) {
-        this.loading = true;
-        // console.log(this.loading);
-      }
-      if (event instanceof NavigationEnd) {
-        this.loading = false;
-        // console.log(this.loading);
-      }
-    });
-    // console.log('this is from app.component.ts');
+  constructor() {
   }
+
+  ngOnInit(): void {
+      if(screen.width <= 1200) {
+        this.screenSizeMatch = false;
+      }
+      else this.screenSizeMatch = true;
+  }
+
+  onResize(e) {
+    // console.log(e.target);
+    if(e.target.innerWidth < 1200) {
+      this.screenSizeMatch = false;
+    } else {
+      this.screenSizeMatch = true;
+    }
+  }
+
 }
